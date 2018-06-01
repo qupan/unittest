@@ -1,0 +1,20 @@
+出现问题
+fatal: Could not read from remote repository.
+
+Please make sure you have the correct access rights
+and the repository exists.
+git did not exit cleanly
+
+
+解决方法：
+
+1、
+在.git目录下找到config文件，用nodepad++打开，找到url对应的那一行，重新写为：
+url = https://server/username/*your*git*app*.git   （比如：url = https://hemcsec.tk/DEEP/myproject.git）
+改完之后保存，重新git push -u origin master  问题解决
+
+2、
+.git下config文件url是这样的：
+ url = git@github.com/username/test.git
+然后对比其它仓库的配置，唯一不同就是域名后面不是用冒号，改为如下就搞定了：
+ url = git@github.com:username/test.git 
