@@ -182,14 +182,9 @@ class Page(Logger):
         locator = ('id','xxx')
         driver.find_element(locator)
         '''
-        try:
-            element = WebDriverWait(
-                self.driver, timeout, 1
-            ).until(EC.presence_of_element_located(locator))
-        except Exception as e:
-            element = WebDriverWait(
-                self.driver, timeout, 1
-            ).until(EC.presence_of_element_located(locator))
+        element = WebDriverWait(
+            self.driver, timeout, 1,'element not find'
+        ).until(EC.presence_of_element_located(locator))
         self.log.info("find by '%s', element is '%s'." % locator)
         return element
 
@@ -199,14 +194,9 @@ class Page(Logger):
         locator = ('id','xxx')
         driver.find_elements(locator)
         '''
-        try:
-            elements = WebDriverWait(
-                self.driver, timeout, 1
-            ).until(EC.presence_of_all_elements_located(locator))
-        except Exception as e:
-            elements = WebDriverWait(
-                self.driver, timeout, 1
-            ).until(EC.presence_of_all_elements_located(locator))
+        elements = WebDriverWait(
+            self.driver, timeout, 1,'element not find'
+        ).until(EC.presence_of_all_elements_located(locator))
         self.log.info("find by '%s', element is '%s'." % locator)
         return elements
 
