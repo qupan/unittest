@@ -1,0 +1,9 @@
+2018-03-21 22:52:07,919 - OA - INFO - beginning of the test case
+2018-03-21 22:52:09,263 - OA - INFO - Open url:'http://localhost/upload/forum.php' success
+2018-03-21 22:52:09,622 - OA - INFO - find by 'name', element is 'username'.
+2018-03-21 22:52:10,950 - OA - INFO - Send 'qupan' to input box success.
+2018-03-21 22:52:11,169 - OA - INFO - find by 'name', element is 'password'.
+2018-03-21 22:52:12,169 - OA - INFO - Send 'qp66666' to input box success.
+2018-03-21 22:52:12,450 - OA - INFO - find by 'css selector', element is 'button[type=submit'.
+2018-03-21 22:52:15,044 - OA - INFO - click element 'button[type=submit', success
+2018-03-21 22:52:18,044 - OA - INFO - end of the test case
