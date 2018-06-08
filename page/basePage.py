@@ -237,6 +237,26 @@ class Page(Logger):
         ActionChains(self.driver).double_click(element).perform()
         self.log.info('ActionChins double click %s' % locator[1])
 
+    def second_find(self, locator,x,y):
+        '''
+        单个元素二次定位，进行点击
+        element=driver.find_element(locator)
+        element.find_elemnt(x,y).click()
+        '''
+        element = self.find_element(locator)
+        element.find_element(x,y).click()
+        self.log.info("click element '%s', success" % y)
+
+    def seconds_find(self, locator,x,y,number):
+        '''
+        多个元素二次定位，进行点击
+        element=driver.find_element(locator)
+        element.find_elemnt(x,y).click()
+        '''
+        element = self.find_elements(locator)
+        element[number].find_element(x,y).click()
+        self.log.info("click element '%s', success" % y)
+
     def move_to_element(self, locator):
         '''
         鼠标悬停操作
