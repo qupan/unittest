@@ -182,9 +182,14 @@ class Page(Logger):
         locator = ('id','xxx')
         driver.find_element(locator)
         '''
-        element = WebDriverWait(
-            self.driver, timeout, 1,'element not find'
-        ).until(EC.presence_of_element_located(locator))
+        try:
+            element = WebDriverWait(
+                self.driver, timeout, 1
+            ).until(EC.presence_of_element_located(locator))
+        except Exception as e:
+            element = WebDriverWait(
+                self.driver, timeout, 1
+            ).until(EC.presence_of_element_located(locator))
         self.log.info("find by '%s', element is '%s'." % locator)
         return element
 
@@ -194,9 +199,14 @@ class Page(Logger):
         locator = ('id','xxx')
         driver.find_elements(locator)
         '''
-        elements = WebDriverWait(
-            self.driver, timeout, 1,'element not find'
-        ).until(EC.presence_of_all_elements_located(locator))
+        try:
+            elements = WebDriverWait(
+                self.driver, timeout, 1
+            ).until(EC.presence_of_all_elements_located(locator))
+        except Exception as e:
+            elements = WebDriverWait(
+                self.driver, timeout, 1
+            ).until(EC.presence_of_all_elements_located(locator))
         self.log.info("find by '%s', element is '%s'." % locator)
         return elements
 
@@ -226,6 +236,26 @@ class Page(Logger):
         element = self.find_element(locator)
         ActionChains(self.driver).double_click(element).perform()
         self.log.info('ActionChins double click %s' % locator[1])
+
+    def second_find(self, locator,x,y):
+        '''
+        单个元素二次定位，进行点击
+        element=driver.find_element(locator)
+        element.find_elemnt(x,y).click()
+        '''
+        element = self.find_element(locator)
+        element.find_element(x,y).click()
+        self.log.info("click element '%s', success" % y)
+
+    def seconds_find(self, locator,x,y,number):
+        '''
+        多个元素二次定位，进行点击
+        element=driver.find_element(locator)
+        element.find_elemnt(x,y).click()
+        '''
+        element = self.find_elements(locator)
+        element[number].find_element(x,y).click()
+        self.log.info("click element '%s', success" % y)
 
     def move_to_element(self, locator):
         '''
