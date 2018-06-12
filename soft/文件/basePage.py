@@ -176,7 +176,7 @@ class Page(Logger):
         self.log.info('close driver!')
 
 
-    def find_element(self, locator, timeout=10):
+    def find_element(self, locator, timeout=2):
         '''
         定位元素，参数locator为元祖类型
         locator = ('id','xxx')
@@ -185,11 +185,18 @@ class Page(Logger):
         try:
             element = WebDriverWait(
                 self.driver, timeout, 1
-            ).until(EC.presence_of_element_located(locator))
+            ).until(EC.presence_of_element_located(locator),message='element not find')
+            element = WebDriverWait(
+                self.driver, timeout, 1
+            ).until(EC.visibility_of_element_located(locator),message='element not find')
         except Exception as e:
             element = WebDriverWait(
                 self.driver, timeout, 1
-            ).until(EC.presence_of_element_located(locator))
+            ).until(EC.presence_of_element_located(locator),message='element not find')
+            element = WebDriverWait(
+                self.driver, timeout, 1
+            ).until(EC.visibility_of_element_located(locator),message='element not find')
+            
         self.log.info("find by '%s', element is '%s'." % locator)
         return element
 
@@ -203,10 +210,16 @@ class Page(Logger):
             elements = WebDriverWait(
                 self.driver, timeout, 1
             ).until(EC.presence_of_all_elements_located(locator))
+            elements = WebDriverWait(
+                self.driver, timeout, 1
+            ).until(EC.visibility_of_all_elements_located(locator))
         except Exception as e:
             elements = WebDriverWait(
                 self.driver, timeout, 1
             ).until(EC.presence_of_all_elements_located(locator))
+            elements = WebDriverWait(
+                self.driver, timeout, 1
+            ).until(EC.visibility_of_all_elements_located(locator))
         self.log.info("find by '%s', element is '%s'." % locator)
         return elements
 
@@ -457,6 +470,14 @@ class Page(Logger):
         self.log.info("get size success,by element '%s'." % locator[1])
         return element.size
 
+    def get_window_size(self):
+        '''
+        获取当前页面大小
+        '''
+        element = self.driver.get_window_size()
+        self.log.info("get size success,by element ")
+        return element
+
     def get_title(self):
         '''
         获取title
@@ -599,11 +620,11 @@ class Page(Logger):
         self.js_execute(js)
         self.log.info('jquery_input text: %s success , by %s'%(text,css))
 
-    def js_scroll_top(self):
+    def js_scroll_top(self,number):
         '''
         滚动到顶部
         '''
-        js = "window.scrollTo(0,0)"
+        js = "window.scrollTo(0,%s)"%number
         self.js_execute(js)
         self.log.info('Roll to the top!')
 

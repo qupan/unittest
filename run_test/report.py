@@ -9,18 +9,13 @@ def suite():
     return y
 def report():
     a=suite()
-    b=time.strftime("%Y_%m_%d %H-%M-%S",time.localtime(time.time()))
+    b=time.strftime("%Y_%m_%d %H-%M-%S")
     c="c:\\test\\report\\"+ b +" report.html"
-    d=open(c,"wb+")
-    e=HTMLTestRunner.HTMLTestRunner(stream=d,
-                                    title="test",
-                                    description="test")
-    #x=unittest.TextTestRunner()
-    #y=x.run(a)
-    #print (y)
-    e.run(a)
-    d.close()
-
+    with open(c,"wb+") as fb:
+        e=HTMLTestRunner.HTMLTestRunner(stream=fb,
+                                        title="test",
+                                        description="test")
+        e.run(a)
 
 if __name__=="__main__":
     report()
