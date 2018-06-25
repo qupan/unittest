@@ -51,3 +51,6 @@ https://blog.csdn.net/kongxx/article/details/7107661
 
 Oracle不能链接
 https://blog.csdn.net/hzs8716/article/details/68924850
+
+html5
+http://www.w3school.com.cn/tags/html_ref_audio_video_dom.asp
