@@ -159,7 +159,7 @@ div滚动条
     [Arguments]    ${x}    ${number}
     等待元素出现    css:${x[1:-1]}
     focus    css:${x[1:-1]}
-    execute javascript    document.querySelectorAll(${x})[0].scollTop=${number}
+    execute javascript    document.querySelectorAll(${x})[0].scrollTop=${number}
     #js定位是使用css定位的    参数${x}:是定位的后半部分    参数${number}：是滚动的位置 ，输入的值
     #例如：'#kw',必须使用引号 括起来    不用写'css:'或者'css='
 
