@@ -430,3 +430,11 @@ Common_Test_Setup
 Common_Test_Teardown
     OperatingSystem.Run    echo “${TEST_NAME}:${TEST_STATUS}:${TEST MESSAGE}” >> D:/robot/report/International-B2B/001demo.txt
     #OperatingSystem.Run    echo “${Suite_NAME}:${Suite_STATUS}:${SuiteMESSAGE}” >> D:/robot/report/International-B2B/001demo.txt
+
+上传
+    [Arguments]    ${locator}    ${name}
+    Wait Until Page Contains Element    ${locator}
+    ${x}    Set Variable    ${CURDIR}
+    ${x1}    Set Variable    ${x.split('\word')[0]}
+    ${excel_address}    连接字符串    ${x1}    \\data\\${name}    #得到excel存放地址
+    Choose File    ${locator}    ${excel_address}
