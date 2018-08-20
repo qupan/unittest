@@ -17,7 +17,7 @@ Library           Telnet
 
 *** Keywords ***
 退出驱动
-    evaluate    os.system('taskkill /f /im firefox.exe')    os
+    #evaluate    os.system('taskkill /f /im firefox.exe')    os
     evaluate    os.system('taskkill /f /im chrome.exe')    os
     evaluate    os.system('taskkill /f /im iexplore.exe')    os
     #运行用例前，关闭所有的 浏览器（ie，火狐，谷歌）
@@ -270,7 +270,7 @@ div滚动条left
     等待元素出现    ${locator}
     focus    ${locator}
     ${x}    get text    ${locator}
-    log    ${x}    #打印实际结果
+    log    ${x.replace('\n',',')}    #打印实际结果
     log    ${text}    #打印预期结果
     should contain    ${x}    ${text}    msg=${message}
     #验证文本参数${locator} 为定位方式    参数${text}：是要输入的文本
@@ -297,9 +297,8 @@ div滚动条left
 
 连接字符串
     [Arguments]    ${str1}    ${str2}
-    ${text}    Catenate    ${str1}    ${str2}
-    ${x}    Set Variable    ${text.replace(' ','')}
-    [Return]    ${x}
+    ${text}    Catenate    SEPARATOR=    ${str1}    ${str2}
+    [Return]    ${text}
 
 得到所有元素
     [Arguments]    ${locator}
@@ -438,3 +437,4 @@ Common_Test_Teardown
     ${x1}    Set Variable    ${x.split('\word')[0]}
     ${excel_address}    连接字符串    ${x1}    \\data\\${name}    #得到excel存放地址
     Choose File    ${locator}    ${excel_address}
+    等待    1
