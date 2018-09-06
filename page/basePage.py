@@ -11,6 +11,7 @@ from selenium import webdriver
 from time import sleep
 import os,logging,time,datetime,re
 import os.path
+import pytest
 
 
 class Logger(object):
@@ -101,6 +102,8 @@ class Page(Logger):
         self.driver = driver
         self.driver.get(url)
         self.log.info("Open url:'%s' success" % url)
+        self.driver.maximize_window()
+        self.log.info('maximize_window')
 
     def start(self):
         self.log.info('beginning of the test case')
@@ -269,6 +272,42 @@ class Page(Logger):
         element = self.find_elements(locator)
         element[number].click()
         self.log.info("click element '%s', success" % locator[1])
+
+    def select_by_index(self, locator, index=0):
+        '''
+        下拉框，通过索引index是索引的第几个，默认从0开始
+        '''
+        element = self.find_element(locator)
+        Select(element).select_by_index(index)
+        self.log.info("select element '%s', success" % locator[1])
+
+    def select_by_value(self, locator, value):
+        '''
+        下拉框，通过value属性查找元素
+        '''
+        element = self.find_element(locator)
+        Select(element).select_by_value(value)
+        self.log.info("select element '%s', success" % locator[1])
+
+    def select_by_text(self, locator, text):
+        '''
+        下拉框，通过text属性查找元素
+        '''
+        element = self.find_element(locator)
+        Select(element).select_by_visible_text(text)
+        self.log.info("select element '%s', success" % locator[1])
+
+    def choose_file(self, locator, file_path):
+        """
+        上传文件，输入定位和文件地址
+        """
+        if not os.path.isfile(file_path):
+            raise ValueError("File '%s' does not exist on the local file "
+                             "system." % file_path)
+        element = self.find_element(locator)
+        self.log.info("find element '%s', success" % locator[1])
+        element.send_keys(file_path)
+        self.log.info("upload file '%s', success" % file_path)
 
     def double_click(self, locator):
         '''
