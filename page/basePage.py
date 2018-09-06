@@ -90,7 +90,7 @@ class Page(Logger):
     '''
 
     def __init__(self, browser, url):
-        Logger.__init__(self,'OA')
+        Logger.__init__(self,'Project')
         self.log = self.getlog()
         if browser=="ie":
             driver=webdriver.Ie()
@@ -174,9 +174,9 @@ class Page(Logger):
         '''
         self.driver.quit()
         self.log.info('close driver!')
+        self.kill_driver()
 
-
-    def find_element(self, locator, timeout=2):
+    def find_element(self, locator, timeout=10):
         '''
         定位元素，参数locator为元祖类型
         locator = ('id','xxx')
@@ -223,6 +223,34 @@ class Page(Logger):
         self.log.info("find by '%s', element is '%s'." % locator)
         return elements
 
+
+    def second_find(self, locator, x, y, timeout=10):
+        '''
+        二次定位元素，参数locator为元祖类型,
+        第一个参数为locator = ('id','xxx')，
+        第二个参数x为定位方式，css
+        第三个参数y：为定位方式的写法“#id"，不用带括号
+        x=driver.find_element(locator)
+        x.find_element(locator).click()
+        '''
+        element = self.find_element(locator)
+        element.find_element(x,y).click()
+        self.log.info("second find click element '%s', success" % locator[1])
+
+    def seconds_find(self, locator, x, y, number, timeout=10):
+        '''
+        二次定位元素，参数locator为元祖类型,
+        第一个参数为locator = ('id','xxx')，
+        第二个参数x为定位方式，css
+        第三个参数y：为定位方式的写法“#id"，不用带括号
+        number为第一个定位的索引
+        x=driver.find_element(locator)
+        x.find_element(locator).click()
+        '''
+        element = self.find_elements(locator)
+        element[number].find_element(x,y).click()
+        self.log.info("seconds find click element '%s', success" % locator[1])
+
     def click(self, locator):
         '''
         点击操作，传入元素的定位器，调用findelement方法接收返回值后执行click操作
@@ -248,27 +276,7 @@ class Page(Logger):
         '''
         element = self.find_element(locator)
         ActionChains(self.driver).double_click(element).perform()
-        self.log.info('ActionChins double click %s' % locator[1])
-
-    def second_find(self, locator,x,y):
-        '''
-        单个元素二次定位，进行点击
-        element=driver.find_element(locator)
-        element.find_elemnt(x,y).click()
-        '''
-        element = self.find_element(locator)
-        element.find_element(x,y).click()
-        self.log.info("click element '%s', success" % y)
-
-    def seconds_find(self, locator,x,y,number):
-        '''
-        多个元素二次定位，进行点击
-        element=driver.find_element(locator)
-        element.find_elemnt(x,y).click()
-        '''
-        element = self.find_elements(locator)
-        element[number].find_element(x,y).click()
-        self.log.info("click element '%s', success" % y)
+        self.log.info('ActionChins double click %s success' % locator[1])
 
     def move_to_element(self, locator):
         '''
@@ -276,7 +284,16 @@ class Page(Logger):
         '''
         element = self.find_element(locator)
         ActionChains(self.driver).move_to_element(element).perform()
-        self.log.info('ActionChins move to %s' % locator[1])
+        self.log.info('ActionChins move to element %s success' % locator[1])
+
+    def move_to_elements(self, locator, number):
+        '''
+        鼠标悬停操作
+        '''
+        element = self.find_elements(locator)
+        ActionChains(self.driver).move_to_element(element[number]).perform()
+        self.log.info('ActionChins move to element %s success' % locator[1])
+
 
     def context_click(self, locator):
         '''
@@ -284,17 +301,20 @@ class Page(Logger):
         '''
         element = self.find_element(locator)
         ActionChains(self.driver).context_click(element).perform()
-        self.log.info('ActionChins context_click %s' % locator[1])
+        self.log.info('ActionChins context_click %s success' % locator[1])
 
-    def drag_and_drop(self, locator, locator1):
+    def drag_and_drop(self, locator, x,y):
         '''
         鼠标拖动,locator为源文件位置
-        locator1是要移动的目标位置
+        第一个参数为locator = ('id','xxx')，
+        x,y我要移动的位置，不用带括号
+        第二个参数x为定位方式，css
+        第三个参数y：为定位方式的写法“#id"
         '''
         element = self.find_element(locator)
-        target = self.find_element(locator1)
+        target = self.find_element(x,y)
         ActionChains(self.driver).drag_and_drop(element,target).perform()
-        self.log.info('ActionChins drag_and_drop %s' % locator[1])
+        self.log.info('ActionChins drag_and_drop %s success' % locator[1])
 
     def send_keys(self, locator, text):
         '''
@@ -464,7 +484,7 @@ class Page(Logger):
 
     def get_size(self, locator):
         '''
-        获取当前页面大小
+        获取当元素大小
         '''
         element = self.find_element(locator)
         self.log.info("get size success,by element '%s'." % locator[1])
@@ -475,7 +495,7 @@ class Page(Logger):
         获取当前页面大小
         '''
         element = self.driver.get_window_size()
-        self.log.info("get size success,by element ")
+        self.log.info("get size success")
         return element
 
     def get_title(self):
@@ -611,7 +631,7 @@ class Page(Logger):
 
     def jq_input(self,css,text):
         '''
-        使用jq输入文本
+        使用jQuery输入文本
         js = 'document.querySelector('#id').click()'
         driver.execute_script(js)
         '''
@@ -620,7 +640,7 @@ class Page(Logger):
         self.js_execute(js)
         self.log.info('jquery_input text: %s success , by %s'%(text,css))
 
-    def js_scroll_top(self,number):
+    def js_scroll_Top(self,number):
         '''
         滚动到顶部
         '''
@@ -628,7 +648,7 @@ class Page(Logger):
         self.js_execute(js)
         self.log.info('Roll to the top!')
 
-    def js_scroll_end(self):
+    def js_scroll_End(self):
         '''
         滚动到底部
         '''
@@ -643,6 +663,16 @@ class Page(Logger):
         '''
         element = self.find_element(('css','%s'%css))
         js = ("document.querySelector(\'%s\').scrollTop=\'%s\'"%(css,str(number)))
+        self.js_execute(js)
+        self.log.info('Roll div top to the %d!'%number)
+
+    def jq_div_scrollTop(self,css,number):
+        '''
+        执行js操作内嵌式div滚动条，上下移动
+        number为上下的位置输入数字
+        '''
+        element = self.find_element(('css','%s'%css))
+        js = ("$(\'%s\').scrollTop=\'%s\'"%(css,str(number)))
         self.js_execute(js)
         self.log.info('Roll div top to the %d!'%number)
 
