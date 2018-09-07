@@ -85,7 +85,7 @@ class Kill(Logger):
         os.system('taskkill /f /im chrome.exe')
         os.system('taskkill /f /im iexplore.exe')
 
-class Page(Logger):
+class Page(Kill):
     '''
     在每个页面类常用的一些方法
     '''
@@ -114,7 +114,7 @@ class Page(Logger):
     def error(self,text):
         self.log.info(u'出现的错误是：%s' % text)
 
-    def open_url(self,url):
+    def get(self,url):
         '''
         打开网址
         driver.get(url)
@@ -191,14 +191,14 @@ class Page(Logger):
             ).until(EC.presence_of_element_located(locator),message='element not find')
             element = WebDriverWait(
                 self.driver, timeout, 1
-            ).until(EC.visibility_of_element_located(locator),message='element not find')
+            ).until(EC.visibility_of_element_located(locator),message='element not visible')
         except Exception as e:
             element = WebDriverWait(
                 self.driver, timeout, 1
             ).until(EC.presence_of_element_located(locator),message='element not find')
             element = WebDriverWait(
                 self.driver, timeout, 1
-            ).until(EC.visibility_of_element_located(locator),message='element not find')
+            ).until(EC.visibility_of_element_located(locator),message='element not visible')
             
         self.log.info("find by '%s', element is '%s'." % locator)
         return element
