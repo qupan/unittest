@@ -297,15 +297,17 @@ class Page(Kill):
         Select(element).select_by_visible_text(text)
         self.log.info("select element '%s', success" % locator[1])
 
-    def choose_file(self, locator, file_path):
+    def choose_file(self, locator, file_path, timeout=10):
         """
         上传文件，输入定位和文件地址
         """
+        element = WebDriverWait(
+            self.driver, timeout, 1
+            ).until(EC.presence_of_element_located(locator),message='element not find')
+        self.log.info("find element '%s', success" % locator[1])
         if not os.path.isfile(file_path):
             raise ValueError("File '%s' does not exist on the local file "
                              "system." % file_path)
-        element = self.find_element(locator)
-        self.log.info("find element '%s', success" % locator[1])
         element.send_keys(file_path)
         self.log.info("upload file '%s', success" % file_path)
 
