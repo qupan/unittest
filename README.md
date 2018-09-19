@@ -64,3 +64,6 @@ https://www.cnblogs.com/cwp-bg/p/python.html
 https://www.zhangxinxu.com/study/201703/font-family-chinese-english.html
 
 https://blog.csdn.net/allan_shore_ma/article/details/62066775
+
+Jenkins插件下载
+https://mirrors.tuna.tsinghua.edu.cn/jenkins/plugins/
