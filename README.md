@@ -71,3 +71,6 @@ https://mirrors.tuna.tsinghua.edu.cn/jenkins/plugins/
 
 EF
 https://ec.ef.com.cn/partner/englishcenters/cn
+
+配置sublime运行rbotframework
+https://www.jianshu.com/p/07ae62d2c63f
