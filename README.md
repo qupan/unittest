@@ -67,3 +67,7 @@ https://blog.csdn.net/allan_shore_ma/article/details/62066775
 
 Jenkins插件下载
 https://mirrors.tuna.tsinghua.edu.cn/jenkins/plugins/
+
+
+EF
+https://ec.ef.com.cn/partner/englishcenters/cn
