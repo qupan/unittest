@@ -74,3 +74,5 @@ https://ec.ef.com.cn/partner/englishcenters/cn
 
 配置sublime运行rbotframework
 https://www.jianshu.com/p/07ae62d2c63f
+
+Docker教程：http://www.runoob.com/docker/windows-docker-install.html
