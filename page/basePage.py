@@ -226,7 +226,12 @@ class Page(Kill):
         定位元素，参数locator为元祖类型
         locator = ('id','xxx')
         driver.find_element(locator)
+        ('css','#kw')
         '''
+        if locator[0]=='css':
+            x=list(locator)
+            x[0]='css selector'
+            locator=tuple(x)
         try:
             element = WebDriverWait(
                 self.driver, timeout, 1
@@ -251,6 +256,10 @@ class Page(Kill):
         locator = ('id','xxx')
         driver.find_elements(locator)
         '''
+        if locator[0]=='css':
+            x=list(locator)
+            x[0]='css selector'
+            locator=tuple(x)
         try:
             elements = WebDriverWait(
                 self.driver, timeout, 1
@@ -345,18 +354,20 @@ class Page(Kill):
         '''
         element = self.find_element(locator)
         action=ActionChains(self.driver)
-        action.click_and_hold(element).perform()  #鼠标左键按下不放
+        #action.click_and_hold(element).perform()  #鼠标左键按下不放
         for i in range(200):
             try:
-                action.move_by_offset(2, 0).perform() #平行移动鼠标
+                #action.move_by_offset(2, 0).perform() #平行移动鼠标一次移动2个像素
+                action.drag_and_drop_by_offset(element, 500, 0).perform()
             except Exception:
                 break
             action.reset_actions()
             sleep(0.001)
-            try:
-                success_text = self.driver.switch_to.alert.text#得到警告框提示
-            except Exception:
-                success_text = 'not get alert message'
+        try:
+            success_text = self.driver.switch_to.alert.text#得到警告框提示
+        except Exception:
+            success_text = 'not get alert message'
+
         return success_text
         self.log.info('ActionChins move handle %s success' % locator[1])
 
@@ -366,17 +377,19 @@ class Page(Kill):
         '''
         element = self.find_elements(locator)[number]
         action=ActionChains(self.driver)
-        action.click_and_hold(element).perform()  #鼠标左键按下不放
+        #action.click_and_hold(element).perform()  #鼠标左键按下不放
         for i in range(200):
             try:
-                action.move_by_offset(2, 0).perform() #平行移动鼠标
+                #action.move_by_offset(2, 0).perform() #平行移动鼠标一次移动2个像素
+                action.drag_and_drop_by_offset(element, 500, 0).perform()
             except Exception:
                 break
             action.reset_actions()
-            try:
-                success_text = self.driver.switch_to.alert.text#得到警告框提示
-            except Exception:
-                success_text = 'not get alert message'
+        try:
+            success_text = self.driver.switch_to.alert.text#得到警告框提示
+        except Exception:
+            success_text = 'not get alert message'
+
         return success_text
         self.log.info('ActionChins move handles %s success' % locator[1])
 
