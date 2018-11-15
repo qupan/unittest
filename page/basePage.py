@@ -11,7 +11,6 @@ from selenium import webdriver
 from time import sleep
 import os,logging,time,datetime,re
 import os.path
-import pytest
 
 
 class Logger(object):
@@ -76,6 +75,8 @@ class Kill(Logger):
         self.log.info("kill IEDriverServer success")
         os.system('taskkill /f /im chromedriver.exe')
         self.log.info("kill chromedriver success")
+        os.system('taskkill /f /im geckodriver.exe')
+        self.log.info("kill geckodriver.exe success")
 
     def kill_browser(self):
         '''
@@ -97,13 +98,54 @@ class Page(Kill):
             driver=webdriver.Ie()
         elif browser=="gc":
             driver=webdriver.Chrome()
+        elif browser=="gc_headless":
+            chrome_options=self.gc_headless()
+            driver=webdriver.Chrome(chrome_options=chrome_options)
         elif browser=="ff":
             driver=webdriver.Firefox()
+        elif browser=="ff_headless":
+            firefox_options=self.ff_headless()
+            driver=webdriver.Firefox(firefox_options=firefox_options)
         self.driver = driver
         self.driver.get(url)
+        self.max()
         self.log.info("Open url:'%s' success" % url)
-        self.driver.maximize_window()
-        self.log.info('maximize_window')
+
+    def gc_headless(self):
+        chrome_options=webdriver.ChromeOptions()
+        #解决DevToolsActivePort文件不存在的报错
+        chrome_options.add_argument('--no-sandbox')
+        #浏览器不提供可视化页面. linux下如果系统不支持可视化不加这条会启动失败
+        chrome_options.add_argument('--headless')
+        #谷歌文档提到需要加上这个属性来规避bug
+        chrome_options.add_argument('--disable-gpu')
+        #指定浏览器分辨率
+        chrome_options.add_argument('--window-size=1920,1080')
+        #不加载图片, 提升速度
+        #chrome_options.add_argument('blink-settings=imagesEnabled=false')
+        #隐藏滚动条, 应对一些特殊页面
+        chrome_options.add_argument('--hide-scrollbars')
+        #手动指定使用的浏览器位置
+        #chrome_options.binary_location = r"C:\Program Files (x86)\Google\Chrome\Application\chrome.exe" 
+        return  chrome_options
+
+    def ff_headless(self):
+        firefox_options=webdriver.FirefoxOptions()
+        #解决DevToolsActivePort文件不存在的报错
+        firefox_options.add_argument('--no-sandbox')
+        #浏览器不提供可视化页面. linux下如果系统不支持可视化不加这条会启动失败
+        firefox_options.add_argument('--headless')
+        #谷歌文档提到需要加上这个属性来规避bug
+        firefox_options.add_argument('--disable-gpu')
+        #指定浏览器分辨率
+        firefox_options.add_argument('--window-size=1920,1080')
+        #不加载图片, 提升速度
+        #firefox_options.add_argument('blink-settings=imagesEnabled=false')
+        #隐藏滚动条, 应对一些特殊页面
+        firefox_options.add_argument('--hide-scrollbars')
+        #手动指定使用的浏览器位置
+        #firefox_options.binary_location = r"C:\Program Files (x86)\Google\Chrome\Application\chrome.exe" 
+        return  firefox_options
 
     def start(self):
         self.log.info('beginning of the test case')
@@ -114,7 +156,7 @@ class Page(Kill):
     def error(self,text):
         self.log.info(u'出现的错误是：%s' % text)
 
-    def get(self,url):
+    def open_url(self,url):
         '''
         打开网址
         driver.get(url)
@@ -191,14 +233,14 @@ class Page(Kill):
             ).until(EC.presence_of_element_located(locator),message='element not find')
             element = WebDriverWait(
                 self.driver, timeout, 1
-            ).until(EC.visibility_of_element_located(locator),message='element not visible')
+            ).until(EC.visibility_of_element_located(locator),message='element not find')
         except Exception as e:
             element = WebDriverWait(
                 self.driver, timeout, 1
             ).until(EC.presence_of_element_located(locator),message='element not find')
             element = WebDriverWait(
                 self.driver, timeout, 1
-            ).until(EC.visibility_of_element_located(locator),message='element not visible')
+            ).until(EC.visibility_of_element_located(locator),message='element not find')
             
         self.log.info("find by '%s', element is '%s'." % locator)
         return element
@@ -273,44 +315,6 @@ class Page(Kill):
         element[number].click()
         self.log.info("click element '%s', success" % locator[1])
 
-    def select_by_index(self, locator, index=0):
-        '''
-        下拉框，通过索引index是索引的第几个，默认从0开始
-        '''
-        element = self.find_element(locator)
-        Select(element).select_by_index(index)
-        self.log.info("select element '%s', success" % locator[1])
-
-    def select_by_value(self, locator, value):
-        '''
-        下拉框，通过value属性查找元素
-        '''
-        element = self.find_element(locator)
-        Select(element).select_by_value(value)
-        self.log.info("select element '%s', success" % locator[1])
-
-    def select_by_text(self, locator, text):
-        '''
-        下拉框，通过text属性查找元素
-        '''
-        element = self.find_element(locator)
-        Select(element).select_by_visible_text(text)
-        self.log.info("select element '%s', success" % locator[1])
-
-    def choose_file(self, locator, file_path, timeout=10):
-        """
-        上传文件，输入定位和文件地址
-        """
-        element = WebDriverWait(
-            self.driver, timeout, 1
-            ).until(EC.presence_of_element_located(locator),message='element not find')
-        self.log.info("find element '%s', success" % locator[1])
-        if not os.path.isfile(file_path):
-            raise ValueError("File '%s' does not exist on the local file "
-                             "system." % file_path)
-        element.send_keys(file_path)
-        self.log.info("upload file '%s', success" % file_path)
-
     def double_click(self, locator):
         '''
         鼠标双击操作
@@ -335,6 +339,46 @@ class Page(Kill):
         ActionChains(self.driver).move_to_element(element[number]).perform()
         self.log.info('ActionChins move to element %s success' % locator[1])
 
+    def move_handle(self, locator):
+        '''
+        使用鼠标移动滑块
+        '''
+        element = self.find_element(locator)
+        action=ActionChains(self.driver)
+        action.click_and_hold(element).perform()  #鼠标左键按下不放
+        for i in range(200):
+            try:
+                action.move_by_offset(2, 0).perform() #平行移动鼠标
+            except Exception:
+                break
+            action.reset_actions()
+            sleep(0.001)
+            try:
+                success_text = self.driver.switch_to.alert.text#得到警告框提示
+            except Exception:
+                success_text = 'not get alert message'
+        return success_text
+        self.log.info('ActionChins move handle %s success' % locator[1])
+
+    def move_handles(self, locator, number):
+        '''
+        使用鼠标移动滑块
+        '''
+        element = self.find_elements(locator)[number]
+        action=ActionChains(self.driver)
+        action.click_and_hold(element).perform()  #鼠标左键按下不放
+        for i in range(200):
+            try:
+                action.move_by_offset(2, 0).perform() #平行移动鼠标
+            except Exception:
+                break
+            action.reset_actions()
+            try:
+                success_text = self.driver.switch_to.alert.text#得到警告框提示
+            except Exception:
+                success_text = 'not get alert message'
+        return success_text
+        self.log.info('ActionChins move handles %s success' % locator[1])
 
     def context_click(self, locator):
         '''
