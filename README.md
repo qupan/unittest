@@ -84,3 +84,8 @@ sublime插件下载：https://packagecontrol.io/browse
 
 w3cscholl：https://www.w3cschool.cn/
 http://www.w3school.com.cn/index.html
+
+python上传文件：
+  PyUserInput：https://github.com/PyUserInput/PyUserInput
+  pyHook：https://www.lfd.uci.edu/~gohlke/pythonlibs/
+  使用：https://blog.csdn.net/shij19/article/details/53046048
