@@ -89,3 +89,7 @@ python上传文件：
   PyUserInput：https://github.com/PyUserInput/PyUserInput
   pyHook：https://www.lfd.uci.edu/~gohlke/pythonlibs/
   使用：https://blog.csdn.net/shij19/article/details/53046048
+  
+  
+ cmd常用命令：
+ https://www.cnblogs.com/yongfengnice/p/6752211.html
