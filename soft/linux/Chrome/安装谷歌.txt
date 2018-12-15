@@ -1,0 +1,7 @@
+https://blog.csdn.net/db_guy/article/details/78811687
+
+
+yum -y install google-chrome-stable --nogpgcheck
+
+yum下载的rpm包离线安装
+https://blog.csdn.net/Dante_003/article/details/72724200
