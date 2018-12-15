@@ -9,7 +9,7 @@ from selenium.webdriver.common.action_chains import ActionChains
 from selenium.common.exceptions import *
 from selenium import webdriver
 from time import sleep
-import os,logging,time,datetime,re，unittest
+import os,logging,time,datetime,re,unittest
 import os.path
 
 
