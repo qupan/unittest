@@ -94,3 +94,10 @@ python上传文件：
  cmd常用命令：
  https://www.cnblogs.com/yongfengnice/p/6752211.html
 https://jingyan.baidu.com/article/4b07be3c907e6f48b280f36d.html
+
+Mac搭建
+Python中strip用法：https://blog.csdn.net/u012671171/article/details/52024874Python
+Python中strip用法：https://blog.csdn.net/u012671171/article/details/5202487
+
+MAC搭建Python+Selenium环境
+把驱动放到:/usr/local/bin下即可
