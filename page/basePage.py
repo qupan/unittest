@@ -99,8 +99,8 @@ class Page(Kill):
         elif browser=="gc":
             driver=webdriver.Chrome()
         elif browser=="gc_headless":
-            chrome_options=self.gc_headless()
-            driver=webdriver.Chrome(chrome_options=chrome_options)
+            options=self.gc_headless()
+            driver=webdriver.Chrome(options=options)
         elif browser=="ff":
             driver=webdriver.Firefox()
         elif browser=="ff_headless":
