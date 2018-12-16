@@ -101,3 +101,4 @@ Python中strip用法：https://blog.csdn.net/u012671171/article/details/5202487
 
 MAC搭建Python+Selenium环境
 把驱动放到:/usr/local/bin下即可
+python官方文档:https://tappy.readthedocs.io/en/latest/producers.html#examples
