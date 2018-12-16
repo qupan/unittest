@@ -4,6 +4,7 @@ pytest
 pytest-html
 pytest-repeat
 pytest-allure-adaptor
+pytest-rerunfailures
 splinter
 Appium-Python-Client
 robotframework
