@@ -1,0 +1,1 @@
+使用yum：https://www.cnblogs.com/dbcloud/p/6701891.html
