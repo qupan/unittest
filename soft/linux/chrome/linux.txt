@@ -1,2 +1,4 @@
 使用yum：https://www.cnblogs.com/dbcloud/p/6701891.html
 http://rpmfind.net/linux/rpm2html/search.php?query=libsystemd.so.0%28LIBSYSTEMD_209%29%2864bit%29&submit=Search+...&system=&arch=
+常用命令：https://www.cnblogs.com/yjd_hycf_space/p/7730690.html
+插件下载：http://mirrors.163.com/centos/7/os/x86_64/Packages/
