@@ -104,3 +104,4 @@ MAC搭建Python+Selenium环境
 python官方文档:https://tappy.readthedocs.io/en/latest/producers.html#examples
 
 linux常用插件下载：http://mirrors.163.com/centos/7/os/x86_64/Packages/
+linux配置环境变量：https://jingyan.baidu.com/article/b87fe19e6b408852183568e8.html
