@@ -2,7 +2,7 @@
 下载源：https://npm.taobao.org/mirrors/chromium-browser-snapshots/
 
 路径：
-Windows系统：node_modules\puppeteer\.local-chromium\win64-609904
+Windows系统：node_modules\puppeteer\.local-chromium\win64-609904\
 
 Linux系统：node_modules/puppeteer/.local-chromium/linux-609904
 
