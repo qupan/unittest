@@ -39,7 +39,6 @@ Werkzeug
 APScheduler
 python_dateutil
 Jinja2
-PyUserInput
 pathlib
-crypto
+pathlibcrypto
 pywin32
