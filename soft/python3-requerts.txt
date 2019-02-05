@@ -40,5 +40,6 @@ APScheduler
 python_dateutil
 Jinja2
 pathlib
-pathlibcrypto
+pathlib2
+crypto
 pywin32
