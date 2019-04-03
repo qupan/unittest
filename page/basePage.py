@@ -9,9 +9,10 @@ from selenium.webdriver.common.action_chains import ActionChains
 from selenium.common.exceptions import *
 from selenium import webdriver
 from time import sleep
+from pathlib2 import Path
 import os,logging,time,datetime,re,unittest
 import os.path
-
+import pytest
 
 class Logger(object):
     '''
@@ -104,11 +105,12 @@ class Page(Kill):
         elif browser=="ff":
             driver=webdriver.Firefox()
         elif browser=="ff_headless":
-            firefox_options=self.ff_headless()
-            driver=webdriver.Firefox(firefox_options=firefox_options)
+            options=self.ff_headless()
+            driver=webdriver.Firefox(options=options)
         self.driver = driver
         self.driver.get(url)
         self.max()
+        self.refresh()
         self.log.info("Open url:'%s' success" % url)
 
     def gc_headless(self):
@@ -147,16 +149,7 @@ class Page(Kill):
         #firefox_options.binary_location = r"C:\Program Files (x86)\Google\Chrome\Application\chrome.exe" 
         return  firefox_options
 
-    def start(self):
-        self.log.info('beginning of the test case')
-
-    def end(self):
-        self.log.info('end of the test case')
-
-    def error(self,text):
-        self.log.info(u'出现的错误是：%s' % text)
-
-    def open_url(self,url):
+    def get(self,url):
         '''
         打开网址
         driver.get(url)
@@ -221,7 +214,7 @@ class Page(Kill):
         self.log.info('close driver!')
         self.kill_driver()
 
-    def find_element(self, locator, timeout=10):
+    def find_element(self, locator, timeout=30):
         '''
         定位元素，参数locator为元祖类型
         locator = ('id','xxx')
@@ -232,133 +225,143 @@ class Page(Kill):
             x=list(locator)
             x[0]='css selector'
             locator=tuple(x)
-        try:
-            element = WebDriverWait(
-                self.driver, timeout, 1
-            ).until(EC.presence_of_element_located(locator),message='element not find')
-            element = WebDriverWait(
-                self.driver, timeout, 1
-            ).until(EC.visibility_of_element_located(locator),message='element not find')
-        except Exception as e:
-            element = WebDriverWait(
-                self.driver, timeout, 1
-            ).until(EC.presence_of_element_located(locator),message='element not find')
-            element = WebDriverWait(
-                self.driver, timeout, 1
-            ).until(EC.visibility_of_element_located(locator),message='element not find')
-            
+        #等待页面包含元素
+        element = WebDriverWait(
+            self.driver, timeout, 1
+            ).until(EC.presence_of_element_located(locator),'Page not contains element.')
+        #等待页面元素显示
+        element = WebDriverWait(
+            self.driver, timeout, 1
+            ).until(EC.visibility_of_element_located(locator),'element not visible .')
         self.log.info("find by '%s', element is '%s'." % locator)
         return element
 
-    def find_elements(self, locator, timeout=10):
+    def find_elements(self, locator, index=0):
         '''
-        定位一组元素,参数locator为元祖类型
-        locator = ('id','xxx')
-        driver.find_elements(locator)
+        定位一组元素
+        参数locator为元素定位：css：#id 或 xpath：//*[@id="id"]
+        index：为元素的索引
         '''
-        if locator[0]=='css':
-            x=list(locator)
-            x[0]='css selector'
-            locator=tuple(x)
-        try:
+        if ('//' not in locator) or ('/' not in locator):
+            locator = ('css selector',locator)
+        else:
+            locator = ('xpath',locator)
+        #等待页面包含元素
+        for i in range(51):
             elements = WebDriverWait(
-                self.driver, timeout, 1
-            ).until(EC.presence_of_all_elements_located(locator))
-            elements = WebDriverWait(
-                self.driver, timeout, 1
-            ).until(EC.visibility_of_all_elements_located(locator))
-        except Exception as e:
-            elements = WebDriverWait(
-                self.driver, timeout, 1
-            ).until(EC.presence_of_all_elements_located(locator))
-            elements = WebDriverWait(
-                self.driver, timeout, 1
-            ).until(EC.visibility_of_all_elements_located(locator))
+                self.driver, 30, 1
+                ).until(EC.presence_of_all_elements_located(locator),'Page not contains element.')
+            if len(elements) >= index+1:
+                break
         self.log.info("find by '%s', element is '%s'." % locator)
         return elements
 
-
-    def second_find(self, locator, x, y, timeout=10):
+    def click(self, locator,index=0):
         '''
-        二次定位元素，参数locator为元祖类型,
-        第一个参数为locator = ('id','xxx')，
-        第二个参数x为定位方式，css
-        第三个参数y：为定位方式的写法“#id"，不用带括号
-        x=driver.find_element(locator)
-        x.find_element(locator).click()
+        点击操作，传入元素的定位器，调用findelements方法接收返回值后执行click操作
+        el=driver.find_elements(locator)
+        el[3].click()
         '''
-        element = self.find_element(locator)
-        element.find_element(x,y).click()
-        self.log.info("second find click element '%s', success" % locator[1])
-
-    def seconds_find(self, locator, x, y, number, timeout=10):
-        '''
-        二次定位元素，参数locator为元祖类型,
-        第一个参数为locator = ('id','xxx')，
-        第二个参数x为定位方式，css
-        第三个参数y：为定位方式的写法“#id"，不用带括号
-        number为第一个定位的索引
-        x=driver.find_element(locator)
-        x.find_element(locator).click()
-        '''
-        element = self.find_elements(locator)
-        element[number].find_element(x,y).click()
-        self.log.info("seconds find click element '%s', success" % locator[1])
-
-    def click(self, locator):
-        '''
-        点击操作，传入元素的定位器，调用findelement方法接收返回值后执行click操作
-        driver.find_element(locator).click()
-        '''
-        element = self.find_element(locator)
-        element.click()
+        for i in range(51):
+            elements = self.find_elements(locator,index)
+            try:
+                elements[index].click()
+                msg='ok'
+            except Exception as e:
+                msg='error'
+            if msg == 'ok':
+                break
         self.log.info("click element '%s', success" % locator[1])
 
-    def click_list(self, locator,number):
+    def select(self, locator, number, index=0):
         '''
-        点击操作，传入元素的定位器，调用findelements方法接收返回值后得到一个列表
-        输入number索引值，执行click操作
-        driver.find_element(locator).click()
+        标准下拉框选择
+        locator：为定位
+        number：为option选项的索引
+        index：为元素索引
         '''
-        element = self.find_elements(locator)
-        element[number].click()
-        self.log.info("click element '%s', success" % locator[1])
+        for i in range(51):
+            elements = self.find_elements(locator,index)
+            try:
+                Select(elements[index]).select_by_index(number)
+                msg='ok'
+            except Exception as e:
+                msg='error'
+            if msg == 'ok':
+                break
+        self.log.info("select element '%s', success" % locator[1])
 
-    def double_click(self, locator):
+    def click_select(self, locator, text, index=0):
+        '''
+        非标准下拉框选择
+        locator：为下拉框定位
+        text：为下拉选项的文本
+        index：为文本索引
+        '''
+        for i in range(51):
+            elements = self.find_elements(locator)
+            try:
+                elements[index].click()
+                msg='ok'
+            except Exception as e:
+                msg='error'
+            if msg == 'ok':
+                break
+        for i in range(51):
+            try:
+                self.js_click_text('li',text,index)
+                msg='ok'
+            except Exception as e:
+                msg='error'
+            if msg == 'ok':
+                break
+        self.log.info("click element '%s', success" % text)
+
+    def double_click(self, locator,index=0):
         '''
         鼠标双击操作
+        el=driver.find_element(locator)
+        ActionChains(driver).double_click(el).perform()
         '''
-        element = self.find_element(locator)
-        ActionChains(self.driver).double_click(element).perform()
+        for i in range(51):
+            elements = self.find_elements(locator,index)
+            try:
+                ActionChains(self.driver).double_click(elements[index]).perform()
+                msg='ok'
+            except Exception as e:
+                msg='error'
+            if msg == 'ok':
+                break
         self.log.info('ActionChins double click %s success' % locator[1])
 
-    def move_to_element(self, locator):
+    def move_to_element(self, locator,index=0):
         '''
         鼠标悬停操作
+        el=driver.find_element(locator)
+        ActionChains(driver).move_to_element(el).perform()
         '''
-        element = self.find_element(locator)
-        ActionChains(self.driver).move_to_element(element).perform()
+        for i in range(51):
+            elements = self.find_elements(locator,index)
+            try:
+                ActionChains(self.driver).move_to_element(elements[index]).perform()
+                msg='ok'
+            except Exception as e:
+                msg='error'
+            if msg == 'ok':
+                break
         self.log.info('ActionChins move to element %s success' % locator[1])
 
-    def move_to_elements(self, locator, number):
-        '''
-        鼠标悬停操作
-        '''
-        element = self.find_elements(locator)
-        ActionChains(self.driver).move_to_element(element[number]).perform()
-        self.log.info('ActionChins move to element %s success' % locator[1])
-
-    def move_handle(self, locator):
+    def move_handle(self, locator,index=0):
         '''
         使用鼠标移动滑块
         '''
-        element = self.find_element(locator)
+        elements = self.find_elements(locator,index)
         action=ActionChains(self.driver)
         #action.click_and_hold(element).perform()  #鼠标左键按下不放
         for i in range(200):
             try:
                 #action.move_by_offset(2, 0).perform() #平行移动鼠标一次移动2个像素
-                action.drag_and_drop_by_offset(element, 500, 0).perform()
+                action.drag_and_drop_by_offset(elements[index], 500, 0).perform()
             except Exception:
                 break
             action.reset_actions()
@@ -368,183 +371,132 @@ class Page(Kill):
         except Exception:
             success_text = 'not get alert message'
 
-        return success_text
         self.log.info('ActionChins move handle %s success' % locator[1])
-
-    def move_handles(self, locator, number):
-        '''
-        使用鼠标移动滑块
-        '''
-        element = self.find_elements(locator)[number]
-        action=ActionChains(self.driver)
-        #action.click_and_hold(element).perform()  #鼠标左键按下不放
-        for i in range(200):
-            try:
-                #action.move_by_offset(2, 0).perform() #平行移动鼠标一次移动2个像素
-                action.drag_and_drop_by_offset(element, 500, 0).perform()
-            except Exception:
-                break
-            action.reset_actions()
-        try:
-            success_text = self.driver.switch_to.alert.text#得到警告框提示
-        except Exception:
-            success_text = 'not get alert message'
-
         return success_text
-        self.log.info('ActionChins move handles %s success' % locator[1])
 
-    def context_click(self, locator):
+    def context_click(self, locator,index=0):
         '''
         鼠标右击操作
+        el=driver.find_element(locator)
+        ActionChains(driver).context_click(el).perform()
         '''
-        element = self.find_element(locator)
-        ActionChains(self.driver).context_click(element).perform()
+        for i in range(51):
+            elements = self.find_elements(locator,index)
+            try:
+                ActionChains(self.driver).context_click(elements[index]).perform()
+                msg='ok'
+            except Exception as e:
+                msg='error'
+            if msg == 'ok':
+                break
         self.log.info('ActionChins context_click %s success' % locator[1])
 
-    def drag_and_drop(self, locator, x,y):
+    def drag_and_drop(self, locator, locator_02):
         '''
-        鼠标拖动,locator为源文件位置
-        第一个参数为locator = ('id','xxx')，
-        x,y我要移动的位置，不用带括号
-        第二个参数x为定位方式，css
-        第三个参数y：为定位方式的写法“#id"
-        '''
+        鼠标拖动操作
         element = self.find_element(locator)
-        target = self.find_element(x,y)
-        ActionChains(self.driver).drag_and_drop(element,target).perform()
+        target = self.find_element(locator)
+        ActionChains(driver).drag_and_drop(element,target).perform()
+        '''
+        for i in range(51):
+            elements = self.find_elements(locator)
+            targets = self.find_elements(locator_02)
+            try:
+                ActionChains(self.driver).drag_and_drop(elements[0],targets[0]).perform()
+                msg='ok'
+            except Exception as e:
+                msg='error'
+            if msg == 'ok':
+                break
         self.log.info('ActionChins drag_and_drop %s success' % locator[1])
 
-    def send_keys(self, locator, text):
+    def send_keys(self, locator, text, index=0):
         '''
-        发送文本，清空后输入
-        locator = ('id','xxx')
-        element.send_keys(locator,text)
+        点击操作，传入元素的定位器，调用findelements方法接收返回值后执行send_keys操作
+        el=driver.find_elements(locator)
+        el[2].clear()
+        el[2].send_keys(text)
         '''
-        element = self.find_element(locator)
-        element.clear()
-        element.send_keys(text)
+        for i in range(51):
+            elements = self.find_elements(locator,index)
+            try:
+                elements[index].clear()
+                elements[index].send_keys(text)
+                msg='ok'
+            except Exception as e:
+                msg='error'
+            if msg == 'ok':
+                break
         self.log.info("Send '%s' to input box success." % text)
 
-    def back_space(self, locator):
-        '''
-        键盘后退键
-        '''
-        element = self.find_element(locator)
-        element.send_keys(Keys.BACK_SPACE)
-        self.log.info("Send BACK_SPACE success.")
-
-    def space(self, locator):
-        '''
-        输入空格
-        '''
-        element = self.find_element(locator)
-        element.send_keys(Keys.SPACE)
-        self.log.info("Send SPACE to input box success.")
-
-    def ctrl_a(self, locator):
-        '''
-        执行组合键：ctrl+a 全选输入框内容
-        '''
-        element = self.find_element(locator)
-        element.send_keys(Keys.CONTROL,'a')
-        self.log.info("Send ctrl+a success。")
-
-    def ctrl_c(self, locator):
-        '''
-        执行组合键：复制（Ctrl+C）
-        '''
-        element = self.find_element(locator)
-        element.send_keys(Keys.CONTROL,'c')
-        self.log.info("Send ctrl+x success.")
-
-    def ctrl_x(self, locator):
-        '''
-        执行组合键：ctrl+x 剪切输入框内容
-        '''
-        element = self.find_element(locator)
-        element.send_keys(Keys.CONTROL,'x')
-        self.log.info("Send ctrl+x success.")
-
-    def ctrl_v(self, locator):
-        '''
-        执行组合键：ctrl+v 粘贴内容到输入框
-        '''
-        element = self.find_element(locator)
-        element.send_keys(Keys.CONTROL,'x')
-        self.log.info("Send ctrl+v success.")
-
-    def enter(self, locator):
-        '''
-        执行键：通过回车键盘来代替点击操作
-        '''
-        element = self.find_element(locator)
-        element.send_keys(Keys.ENTER)
-        self.log.info("Send ENTER success.")
-
-    def tab(self, locator):
-        '''
-        执行键：制表键(Tab)
-        '''
-        element = self.find_element(locator)
-        element.send_keys(Keys.TAB)
-        self.log.info("Send TAB success.")
-
-    def esc(self, locator):
-        '''
-        执行键：回退键（Esc）
-        '''
-        element = self.find_element(locator)
-        element.send_keys(Keys.ESCAPE)
-        self.log.info("Send Keys.ESCAPE success.")
-
-    def switch_frame(self,locator):
+    def switch_frame(self, locator, index=0):
         '''
         切到frame中(switch_to.frame())
+        el=driver.find_elements(locator)
+        driver.switch_to.frame(el[index])
         '''
-        element = self.find_element(locator)
-        self.driver.switch_to.frame(element)
+        for i in range(51):
+            elements = self.find_elements(locator,index)
+            try:
+                self.driver.switch_to.frame(elements[index])
+                msg='ok'
+            except Exception as e:
+                msg='error'
+            if msg == 'ok':
+                break
         self.log.info("switch to frame success,by element ")
 
     def default_content(self):
         '''
         从frame中切回主文档(switch_to.default_content())
         '''
-        self.driver.switch_to.default_content()
+        for i in range(51):
+            elements = self.find_elements(locator,index)
+            try:
+                self.driver.switch_to.default_content()
+                msg='ok'
+            except Exception as e:
+                msg='error'
+            if msg == 'ok':
+                break
         self.log.info("switch to default_content success,by element .")
 
     def parent_frame(self):
         '''
         嵌套frame的操作(switch_to.parent_frame()),返回上一层frame
         '''
-        self.driver.switch_to.parent_frame()
+        for i in range(51):
+            elements = self.find_elements(locator,index)
+            try:
+                self.driver.switch_to.parent_frame()
+                msg='ok'
+            except Exception as e:
+                msg='error'
+            if msg == 'ok':
+                break
         self.log.info("switch to parent_frame success,by element ")
 
-    def current_window(self):
+    def switch_window(self,locator):
         '''
-        获得当前所有打开的窗口的句柄：
-        driver.window_handles
+        切换窗口locator可以使用网页标题，或者网址
+        例如： "title" 或者  "https://www.baidu.com/"
         '''
-        element = self.driver.current_window_handle
-        self.log.info("get current_window success")
-        return element
-
-    def window_handles(self):
-        '''
-        获得当前所有打开的窗口的句柄：
-        driver.window_handles
-        '''
-        element = self.driver.window_handles
-        self.log.info("get window_handles success")
-        return element
-
-    def switch_window(self,x,y):
-        '''
-        切到frame中(switch_to.frame())
-        传入两个句柄的列表，切换到第一个窗口时，
-        传入第一个窗口句柄的列表和一个空列表[]
-        '''
-        z=[list(set(x)-set(y))[0] if len(x) > len(y) else list(set(y)-set(x))[0]]
-        self.switch_to_window(z[0])
+        msg = []
+        handles = self.driver.window_handles
+        for k in range(50):
+            for i in handles:
+                self.driver.switch_to.window(i)
+                title = self.get_title()
+                url = self.get_url()
+                msg.append([i,title,url])
+            for i in msg:
+                for j in i:
+                    if locator == j:
+                        self.driver.switch_to.window(i[0])
+                        result = 'success'
+                        break
+            if result == 'success':
+                break
         self.log.info("switch window success")
 
     def alert_text(self):
@@ -625,118 +577,68 @@ class Page(Kill):
         element = self.find_element(locator)
         self.log.info("get attribute success,by element '%s'." % locator[1])
         return element.get_attribute(name)
-
-    def get_cookies(self):
-        '''
-        获得所有 cookie 信息
-        driver.get_cookies()
-        '''
-        self.log.info('get all cookies success')
-        return self.driver.get_cookies()
-
-    def get_cookie(self,name):
-        '''
-        返回有特定 name 值有 cookie 信息
-        driver.get_cookie(name)
-        '''
-        self.log.info('get all cookies success')
-        return self.driver.get_cookie(name)
-
-    def add_cookie(self,text):
-        '''
-        添加 cookie，必须有 name 和 value 值
-        driver.add_cookie({'name':'key-aaaaaaa', 'value':'value-bbbbbb'})
-        '''
-        self.driver.add_cookie(text)
-        self.log.info('add cookies success')
-        
-
-    def delete_cookie(self,name):
-        '''
-        删除特定(部分)的 cookie 信息
-        driver.delete_cookie(name)
-        '''
-        self.driver.add_cookie(text)
-        self.log.info('add cookies success')
-        
-
-    def delete_all_cookies(self):
-        '''
-        删除所有 cookie 信息
-        driver.delete_cookie(name)
-        '''
-        self.driver.add_cookie(text)
-        self.log.info('add cookies success')
         
     def js_execute(self, js):
         '''
         执行js
         '''
-        self.log.info('Execute js by %s' % js)
         self.driver.execute_script(js)
+        self.log.info('Execute js by %s success' % js)
 
-    def js_focus_element(self, locator):
+    def js_click(self,css, index=0):
         '''
-        聚焦元素
-        '''
-        target = self.find_element(locator)
-        self.driver.execute_script("arguments[0].scrollIntoView();", target)
-
-    def js_click(self,css):
-        '''
-        使用js执行点击
-        js = 'document.querySelector('#id').click()'
+        使用js执行点击,只能使用css定位
+        js = "document.querySelectorAll('#id')[0].click()"
         driver.execute_script(js)
         '''
-        element = self.find_element(('css','%s'%css))
-        js = ("document.querySelector(\'%s\').click()"%css)
-        #self.driver.execute_script(js)
-        self.js_execute(js)
+        for i in range(51):
+            elements = self.find_elements(css,index)
+            try:
+                js = "document.querySelectorAll(\'{}\')[{}].click()".format(css,index)
+                self.js_execute(js)
+                msg='ok'
+            except Exception as e:
+                msg='error'
+            if msg == 'ok':
+                break
         self.log.info('js_click success , by %s'%css)
 
-    def jq_click(self,css):
-        '''
-        使用jquery执行点击
-        js = '$('#id').click()'
-        driver.execute_script(js)
-        '''
-        element = self.find_element(('css','%s'%css))
-        js = ("$(\'%s\').click()"%css)
-        self.js_execute(js)
-        self.log.info('jq_click success,by %s'%css)
-
-    def jq_dblclick(self,css):
-        '''
-        使用jquery执行双击
-        js = '$('#id').dblclick()'
-        driver.execute_script(js)
-        '''
-        element = self.find_element(('css','%s'%css))
-        js = ("$(\'%s\').dblclick()"%css)
-        self.js_execute(js)
-        self.log.info('jq_double_click success,by %s'%css)
-
-    def js_input(self,css,text):
+    def js_input(self,css,text,index=0):
         '''
         使用js输入文本
-        js = 'document.querySelector('#id').click()'
+        js = "document.querySelectorAll('#id')[0].value='text'"
         driver.execute_script(js)
         '''
-        element = self.find_element(('css','%s'%css))
-        js = ("document.querySelector(\'%s\').value=\'%s\'"%(css,text))
-        self.js_execute(js)
-        self.log.info('js_input text: %s success , by %s'%(text,css))
+        for i in range(51):
+            elements = self.find_elements(css,index)
+            try:
+                js = "document.querySelectorAll(\'{}\')[{}].value=\'{}\'".format(css,index,text)
+                self.js_execute(js)
+                msg='ok'
+            except Exception as e:
+                msg='error'
+            if msg == 'ok':
+                break
+        self.log.info('js input text: %s success , by %s'%(text,css))
 
-    def jq_input(self,css,text):
+    def js_click_text(self, label, text, index=0):
         '''
-        使用jQuery输入文本
-        js = 'document.querySelector('#id').click()'
-        driver.execute_script(js)
+        根据标签之间的文本使用JavaScript进行点击，
+        label：是标签名称
+        text：是标签之间的文本
+        index：是元素索引
         '''
-        element = self.find_element(('css','%s'%css))
-        js = ("$(\'%s\').val(\'%s\')"%(css,text))
-        self.js_execute(js)
-        self.log.info('jquery_input text: %s success , by %s'%(text,css))
+        for i in range(51):
+            elements = self.find_elements('//{}[contains(string(),\"{}\")]'.format(label,text),index)
+            try:
+                js = "arguments[0].click()"
+                self.driver.execute_script(js,elements[index])
+                msg='ok'
+            except Exception as e:
+                msg='error'
+            if msg == 'ok':
+                break
+        self.log.info("click label '%s', success" % label)
 
     def js_scroll_Top(self,number):
         '''
@@ -764,15 +666,7 @@ class Page(Kill):
         self.js_execute(js)
         self.log.info('Roll div top to the %d!'%number)
 
-    def jq_div_scrollTop(self,css,number):
-        '''
-        执行js操作内嵌式div滚动条，上下移动
-        number为上下的位置输入数字
-        '''
-        element = self.find_element(('css','%s'%css))
-        js = ("$(\'%s\').scrollTop=\'%s\'"%(css,str(number)))
-        self.js_execute(js)
-        self.log.info('Roll div top to the %d!'%number)
+
 
     def js_div_scrollLeft(self,css,number):
         '''
@@ -797,113 +691,45 @@ class Page(Kill):
             self.log.info('Failed to take the screenshot!%s' % e)
             self.get_windows_img()
 
-    def is_text_in_element(self, locator, text, timeout=10):
+    def jq_click(self,css):
         '''
-        判断文本在元素里，没有元素返回false打印日志，定位到返回判断结果的布尔值
-        result = driver.text_in_element(locator,text)
+        使用jquery执行点击
+        js = '$('#id').click()'
+        driver.execute_script(js)
         '''
-        try:
-            result = WebDriverWait(
-                self.driver, timeout, 1
-            ).until(EC.text_to_be_present_in_element(locator, text))
-        except TimeoutException:
-            logger.info('No location to the element.')
-            return False
-        else:
-            return result
+        element = self.find_element(('css','%s'%css))
+        js = ("$(\'%s\').click()"%css)
+        self.js_execute(js)
+        self.log.info('jq_click success,by %s'%css)
 
-    def is_text_in_value(self, locator, value, timeout=10):
+    def jq_dblclick(self,css):
         '''
-        判断元素的value值，没定位到元素返回false，定位到返回判断结果布尔值
-        result = dirver.text_to_be_present_in_element_value(locator,text)
+        使用jquery执行双击
+        js = '$('#id').dblclick()'
+        driver.execute_script(js)
         '''
-        try:
-            result = WebDriverWait(
-                self.driver, timeout, 1
-            ).until(EC.text_to_be_present_in_element_value(locator, value))
-        except TimeoutException:
-            logger.info('No location to the element.')
-            return False
-        else:
-            return result
+        element = self.find_element(('css','%s'%css))
+        js = ("$(\'%s\').dblclick()"%css)
+        self.js_execute(js)
+        self.log.info('jq_double_click success,by %s'%css)
 
-    def is_title(self, title, timeout=10):
+    def jq_input(self,css,text):
         '''
-        判断元素的title是否完全等于
+        使用jQuery输入文本
+        js = 'document.querySelector('#id').click()'
+        driver.execute_script(js)
         '''
-        result = WebDriverWait(
-            self.driver, timeout, 1
-        ).until(EC.title_is(title))
-        return result
+        element = self.find_element(('css','%s'%css))
+        js = ("$(\'%s\').val(\'%s\')"%(css,text))
+        self.js_execute(js)
+        self.log.info('jquery_input text: %s success , by %s'%(text,css))
 
-    def is_title_contains(self, title, timeout=10):
+    def jq_div_scrollTop(self,css,number):
         '''
-        判断元素的title是否包含
+        执行js操作内嵌式div滚动条，上下移动
+        number为上下的位置输入数字
         '''
-        result = WebDriverWait(
-            self.driver, timeout, 1
-        ).until(EC.title_contains(title))
-        return result
-
-    def is_selected(self, locator, timeout=10):
-        '''
-        判断元素是否被选中
-        '''
-        result = WebDriverWait(
-            self.driver, timeout, 1
-        ).until(EC.element_located_to_be_selected(locator))
-        return result
-
-    def is_selected_be(self, locator, selected=True, timeout=10):
-        '''
-        判断元素的状态是不是符合期望的状态，selected是期望的状态
-        '''
-        result = WebDriverWait(
-            self.driver, timeout, 1
-        ).until(EC.element_located_selection_state_to_be(locator, selected))
-        return result
-
-    def is_alert_present(self, timeout=10):
-        '''
-        判断页面是否有alert,有的话返回alert，没有返回False
-        '''
-        result = WebDriverWait(
-            self.driver, timeout, 1
-        ).until(EC.alert_is_present())
-        return result
-
-    def is_visibility(self, locator, timeout=10):
-        '''
-        元素可见，返回本身，不可见返回False
-        '''
-        result = WebDriverWait(
-            self.driver, timeout, 1
-        ).until(EC.visibility_of_element_located(locator))
-        return result
-
-    def is_invisibility(self, locator, timeout=10):
-        '''
-        元素可见返回本身，不可见返回Ture,没有找到元素也返回Ture
-        '''
-        result = WebDriverWait(
-            self.driver, timeout, 1
-        ).until(EC.invisibility_of_element_located(locator))
-        return result
-
-    def is_clickable(self, locator, timeout=10):
-        '''
-        元素可以点击is_enabled返回本身，不可点击返回False
-        '''
-        result = WebDriverWait(
-            self.driver, timeout, 1
-        ).until(EC.element_to_be_clickable(locator))
-        return result
-
-    def is_located(self, locator, timeout=10):
-        '''
-        判断元素有没有被定位到(并不意味着可见),定位到返回element，没有定位到返回False
-        '''
-        result = WebDriverWait(
-            self.driver, timeout, 1
-        ).until(EC.presence_of_all_elements_located(locator))
-        return result
+        element = self.find_element(('css','%s'%css))
+        js = ("$(\'%s\').scrollTop=\'%s\'"%(css,str(number)))
+        self.js_execute(js)
+        self.log.info('Roll div top to the %d!'%number)
