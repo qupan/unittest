@@ -125,6 +125,7 @@ selenium的chromedriver参数add_argument
 https://peter.sh/experiments/chromium-command-line-switches/
 https://blog.csdn.net/weixin_43968923/article/details/87899762
 启动参数	作用
+--user-data-dir 用户配置文件路径
 --user-agent=""	设置请求头的User-Agent
 --window-size=1366,768	设置浏览器分辨率（窗口大小）
 --headless	无界面运行（无窗口）
