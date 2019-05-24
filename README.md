@@ -120,3 +120,34 @@ python官方文档:https://tappy.readthedocs.io/en/latest/producers.html#example
 
 linux常用插件下载：http://mirrors.163.com/centos/7/os/x86_64/Packages/
 linux配置环境变量：https://jingyan.baidu.com/article/b87fe19e6b408852183568e8.html
+
+selenium的chromedriver参数add_argument
+https://peter.sh/experiments/chromium-command-line-switches/
+https://blog.csdn.net/weixin_43968923/article/details/87899762
+启动参数	作用
+--user-agent=""	设置请求头的User-Agent
+--window-size=1366,768	设置浏览器分辨率（窗口大小）
+--headless	无界面运行（无窗口）
+--start-maximized	最大化运行（全屏窗口）
+--incognito	隐身模式（无痕模式）
+--disable-javascript	禁用javascript
+--disable-infobars	禁用浏览器正在被自动化程序控制的提示
+
+https://blog.csdn.net/weixin_43968923/article/details/87899762
+chrome_options.add_argument('--user-agent=""')  # 设置请求头的User-Agent
+chrome_options.add_argument('--window-size=1280x1024')  # 设置浏览器分辨率（窗口大小）
+chrome_options.add_argument('--start-maximized')  # 最大化运行（全屏窗口）,不设置，取元素会报错
+chrome_options.add_argument('--disable-infobars')  # 禁用浏览器正在被自动化程序控制的提示
+chrome_options.add_argument('--incognito')  # 隐身模式（无痕模式）
+chrome_options.add_argument('--hide-scrollbars')  # 隐藏滚动条, 应对一些特殊页面
+chrome_options.add_argument('--disable-javascript')  # 禁用javascript
+chrome_options.add_argument('--blink-settings=imagesEnabled=false')  # 不加载图片, 提升速度
+chrome_options.add_argument('--headless')  # 浏览器不提供可视化页面
+
+chrome_options.add_argument('--ignore-certificate-errors')  # 禁用扩展插件并实现窗口最大化
+chrome_options.add_argument('--disable-gpu')  # 禁用GPU加速
+chrome_options.add_argument('–disable-software-rasterizer')
+chrome_options.add_argument('--disable-extensions')
+chrome_options.add_argument('--start-maximized')
+
+--disable-infobars	禁用浏览器正在被自动化程序控制的提示
