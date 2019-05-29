@@ -7,6 +7,8 @@ python+selenium自动化测试框架
 注：没有生成excel报告，多浏览器、多线程、分布式执行等模块，后续会继续添加，丰富自动化框架
 常用的文件在soft文件夹中
 
+清华大学开源软件镜像站：https://mirror.tuna.tsinghua.edu.cn/help/gitlab-ce/
+
 各种浏览器驱动下载地址：https://www.seleniumhq.org/download/
 火狐：  https://github.com/mozilla/geckodriver/releases
 谷歌：  http://chromedriver.storage.googleapis.com/index.html
