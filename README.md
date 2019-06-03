@@ -92,6 +92,8 @@ https://ec.ef.com.cn/partner/englishcenters/cn
 配置sublime运行rbotframework
 https://www.jianshu.com/p/07ae62d2c63f
 
+配置sublime运行python3：https://www.cnblogs.com/ch-n/p/6813988.html
+
 Docker教程：http://www.runoob.com/docker/windows-docker-install.html
 https://blog.csdn.net/u011681409/article/details/82695087
 
