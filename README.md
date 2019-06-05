@@ -156,3 +156,5 @@ chrome_options.add_argument('--disable-extensions')
 chrome_options.add_argument('--start-maximized')
 
 --disable-infobars	禁用浏览器正在被自动化程序控制的提示
+
+用 Pytest+Appium+Allure：https://testerhome.com/topics/19327
