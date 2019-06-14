@@ -158,3 +158,8 @@ chrome_options.add_argument('--start-maximized')
 --disable-infobars	禁用浏览器正在被自动化程序控制的提示
 
 用 Pytest+Appium+Allure：https://testerhome.com/topics/19327
+
+
+先关闭夜神模拟器，并查看确认任务管理器中已经不存在adb.exe或nox_adb.exe进程；
+将路径android-sdk-windows\platform-tools下的adb.exe copy到夜神模拟器的安装路径下\Nox\bin，替换到nox_adb.exe，并改名为nox_adb.exe。
+再次启动夜神模拟器就行啦~
