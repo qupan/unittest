@@ -1,0 +1,17 @@
+{
+    "cmd": ["node", "$file"],
+    "file_regex": "^[ ]*File \"(...*?)\", line ([0-9]*)",
+    "working_dir": "${project_path:${folder}}",
+    "selector": "source.js",
+    "shell": true,
+    "encoding": "utf-8",
+    "windows": {
+        "cmd": ["node", "$file"]
+    },
+    "linux": {
+        "cmd": ["killall node; node", "$file"]
+    },
+    "osx": {
+        "cmd": ["killall node >/dev/null 2>&1; node $file"]
+    }
+}
