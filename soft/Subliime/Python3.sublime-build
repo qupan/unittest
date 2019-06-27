@@ -1,0 +1,6 @@
+{
+"cmd":["python3.exe", "-u", "$file"],
+"path":"C:/Python37",   // 注意：路径根据自己的python3安装路径而定 
+"file_regex": "^[ ]*File \"(...*?)\", line ([0-9]*)",
+"selector": "source.python"
+}
