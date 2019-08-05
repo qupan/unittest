@@ -1,2 +1,0 @@
-谷歌插件selenium IDE 下载：http://www.cnplugins.com/devtool/selenium-ide-dev/download.html
-http://www.cnplugins.com/devtool/
